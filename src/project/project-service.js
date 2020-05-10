@@ -9,6 +9,7 @@ const ProjectService = {
     getProject(db, uuid) {
         return db
             .from('wedo_projects')
+            .select('*')
             .where({ uuid })
     }
 }
