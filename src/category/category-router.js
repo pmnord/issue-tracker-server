@@ -30,7 +30,7 @@ CategoryRouter
     .route('/:category_id')
     .patch(jsonBodyParser, (req, res, next) => {
         if (!req.body) {return res.status(400).json({ Error: `Missing request body` })}
-        
+
         const { title, index } = req.body;
 
         const newValues = { title, index };
@@ -44,13 +44,10 @@ CategoryRouter
             .catch(next)
     })
     .delete((req, res, next) => {
-        if (!req.body) {return res.status(400).json({ Error: `Missing request body` })}
-
-        const { category_id } = req.body;
 
         CategoryService.deleteCategory(
             req.app.get('db'),
-            category_id
+            req.params.category_id
         )
             .then(() => res.status(204).end())
             .catch(next)
