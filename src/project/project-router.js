@@ -1,7 +1,8 @@
 const express = require('express');
 const ProjectService = require('./project-service.js');
-const ProjectRouter = express.Router();
 const { nanoid } = require('nanoid');
+
+const ProjectRouter = express.Router();
 
 ProjectRouter
     .route('/')
