@@ -1,4 +1,10 @@
 const TaskService = {
+    getTasksByCategoryId(db, category_id) {
+        return db
+            .from('wedo_tasks')
+            .select('*')
+            .where({ category_id })
+    },
     insertTask(db, task) {
         return db
             .into('wedo_tasks')

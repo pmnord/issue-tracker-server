@@ -17,6 +17,12 @@ A collaborative kanban board supporting user concurrency, implemented with React
 
 ### Project Endpoints
 
+#### POST /api/project/
+Generates a new Project with a UUID which is returned to the client.
+
+#### GET /api/project/:uuid
+Returns a project object, complete with categories and tasks subarrays. The project object can then be loaded into the client application state without requiring any further API calls.
+
 ### Category Endpoints
 
 ### Task Endpoints

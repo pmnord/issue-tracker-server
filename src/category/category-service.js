@@ -1,4 +1,10 @@
 const CategoryService = {
+    getCategoriesByProjectId(db, project_id) {
+        return db
+            .from('wedo_categories')
+            .select('*')
+            .where({ project_id })
+    },
     insertCategory(db, category) {
         return db
             .into('wedo_categories')
