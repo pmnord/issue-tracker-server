@@ -7,6 +7,7 @@ const { NODE_ENV } = require('./config');
 
 const ProjectRouter = require('./project/project-router');
 const CategoryRouter = require('./category/category-router');
+const TaskRouter = require('./task/task-router');
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.get('/', (req, res) => {
 });
 app.use('/api/project', ProjectRouter);
 app.use('/api/category', CategoryRouter);
+app.use('/api/task', TaskRouter);
 
 // Error handler
 app.use(function errorHandler(error, req, res, next) {

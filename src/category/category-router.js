@@ -44,7 +44,6 @@ CategoryRouter
             .catch(next)
     })
     .delete((req, res, next) => {
-
         CategoryService.deleteCategory(
             req.app.get('db'),
             req.params.category_id
