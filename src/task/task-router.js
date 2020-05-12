@@ -17,8 +17,8 @@ TaskRouter
         }
 
         const { 
-            title, 
-            index, 
+            title,
+            index,
             category_id } = req.body;
 
         const newTask = {
@@ -31,7 +31,7 @@ TaskRouter
             req.app.get('db'),
             newTask
         )
-            .then(() => res.status(201).end())
+            .then(dbTask => res.status(201).json(dbTask))
             .catch(next)
     })
 
@@ -63,9 +63,22 @@ TaskRouter
             .then(() => res.status(204).end())
             .catch(next)
     })
-    .delete((req, res, next) => {
+    .delete(jsonBodyParser, (req, res, next) => {
+        const { toReIndex } = req.body;
+        const db = req.app.get('db')
+        console.log(toReIndex)
+        console.log(req.body)
+
+        toReIndex.forEach(task => {
+            TaskService.updateTask(
+                db,
+                task.id,
+                { index: task.index - 1 }
+            )
+        })
+
         TaskService.deleteTask(
-            req.app.get('db'),
+            db,
             req.params.task_id
         )
             .then(() => res.status(204).end())

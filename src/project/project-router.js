@@ -65,7 +65,7 @@ ProjectRouter
                                 }
                             })
 
-                            category.tasks = tasks;
+                            category.tasks = tasks.sort((a, b) => a.index - b.index);
                             return;
                         })
                 }
