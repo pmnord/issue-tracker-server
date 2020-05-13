@@ -64,8 +64,9 @@ ProjectRouter
                                     task.tags = task.tags.split(' ').map(str => str.replace(/&#32;/g, ' '));
                                 }
                             })
-
+                            
                             category.tasks = tasks.sort((a, b) => a.index - b.index);
+                            
                             return;
                         })
                 }

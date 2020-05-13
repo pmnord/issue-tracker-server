@@ -46,12 +46,30 @@ CategoryRouter
             .then(() => res.status(204).end())
             .catch(next)
     })
-    .delete((req, res, next) => {
+    .delete(jsonBodyParser, (req, res, next) => {
+        const db = req.app.get('db');
+        console.log(req.body);
+
         CategoryService.deleteCategory(
-            req.app.get('db'),
+            db,
             req.params.category_id
         )
-            .then(() => res.status(204).end())
+            .then(async () => {
+                const { toReIndex } = req.body;
+
+                /* After deleting a category we need to adjust the indexes
+                of the other categories accordingly */
+                
+                await toReIndex.forEach(category => {
+                    CategoryService.updateCategory(
+                        db,
+                        category.id,
+                        { index: category.index - 1 }
+                    )
+                })
+
+                return res.status(204).end()
+            })
             .catch(next)
     })
 

@@ -39,6 +39,19 @@ TaskRouter
     .route('/:task_id')
     .patch(jsonBodyParser, (req, res, next) => {
         if (!req.body) { return res.status(400).json({ Error: `Missing request body` }) }
+        
+        /* In case a task is swapping indexes with another task, the client must
+        send a 'swapee' object containing the id of the object and its new index */
+        if (req.body.swapee) {
+            const { swapee } = req.body;
+            console.log(swapee)
+
+            TaskService.updateTask(
+                req.app.get('db'),
+                swapee.id,
+                { index: swapee.index }
+            )
+        }
 
         const {
             title,
@@ -62,6 +75,7 @@ TaskRouter
         )
             .then(() => res.status(204).end())
             .catch(next)
+       
     })
     .delete(jsonBodyParser, (req, res, next) => {
         const { toReIndex } = req.body;
