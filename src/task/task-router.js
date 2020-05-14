@@ -44,13 +44,12 @@ TaskRouter
         send a 'swapee' object containing the id of the object and its new index */
         if (req.body.swapee) {
             const { swapee } = req.body;
-            console.log(swapee)
 
             TaskService.updateTask(
                 req.app.get('db'),
                 swapee.id,
                 { index: swapee.index }
-            )
+            );
         }
 
         const {
@@ -74,21 +73,19 @@ TaskRouter
             newValues
         )
             .then(() => res.status(204).end())
-            .catch(next)
+            .catch(next);
        
     })
     .delete(jsonBodyParser, (req, res, next) => {
         const { toReIndex } = req.body;
         const db = req.app.get('db')
-        console.log(toReIndex)
-        console.log(req.body)
 
         toReIndex.forEach(task => {
             TaskService.updateTask(
                 db,
                 task.id,
                 { index: task.index - 1 }
-            )
+            );
         })
 
         TaskService.deleteTask(
@@ -96,7 +93,7 @@ TaskRouter
             req.params.task_id
         )
             .then(() => res.status(204).end())
-            .catch(next)
+            .catch(next);
     })
 
 module.exports = TaskRouter;

@@ -25,6 +25,12 @@ const CategoryService = {
             .from('wedo_categories')
             .where({ id })
             .delete()
+    },
+    deleteTasksInCategory(db, category_id) {
+        return db
+            .from('wedo_tasks')
+            .where({ category_id })
+            .delete()
     }
 }
 

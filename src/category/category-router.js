@@ -59,7 +59,7 @@ CategoryRouter
 
                 /* After deleting a category we need to adjust the indexes
                 of the other categories accordingly */
-                
+
                 await toReIndex.forEach(category => {
                     CategoryService.updateCategory(
                         db,
@@ -67,6 +67,11 @@ CategoryRouter
                         { index: category.index - 1 }
                     )
                 })
+
+                await CategoryService.deleteTasksInCategory(
+                    db,
+                    req.params.category_id
+                )
 
                 return res.status(204).end()
             })
