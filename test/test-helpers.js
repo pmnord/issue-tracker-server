@@ -14,12 +14,12 @@ const TestHelpers = {
             await trx.into('wedo_categories').insert(categories);
             await trx.raw(
                 `SELECT setval('wedo_categories_id_seq', ?)`,
-                [plants[plants.length - 1].id]
+                [categories[categories.length - 1].id]
             );
 
             await trx.into('wedo_tasks').insert(tasks);
             await trx.raw(
-                `SELECT setval('wedo_tasks', ?)`,
+                `SELECT setval('wedo_tasks_id_seq', ?)`,
                 [tasks[tasks.length - 1].id]
             );
         });
@@ -48,6 +48,7 @@ const TestHelpers = {
     makeTestProject() {
         return [
             {
+                "id": 1,
                 "uuid": nanoid()
             },
         ];
@@ -55,11 +56,13 @@ const TestHelpers = {
     makeTestCategories() {
         return [
             {
+                "id": 1,
                 "title": "Project 1 Category 1",
                 "index": 0,
                 "project_id": 1
             },
             {
+                "id": 2,
                 "title": "Project 1 Category 2",
                 "index": 1,
                 "project_id": 1
@@ -69,6 +72,7 @@ const TestHelpers = {
     makeTestTasks() {
         return [
             {
+                "id": 1,
                 "title": "Foo",
                 "index": 0,
                 "tags": "foo bar",
@@ -76,6 +80,7 @@ const TestHelpers = {
                 "category_id": 1
             },
             {
+                "id": 2,
                 "title": "Foo",
                 "index": 1,
                 "tags": "foo bar",
@@ -83,6 +88,7 @@ const TestHelpers = {
                 "category_id": 1
             },
             {
+                "id": 3,
                 "title": "Foo",
                 "index": 0,
                 "tags": "foo bar",
@@ -90,6 +96,7 @@ const TestHelpers = {
                 "category_id": 2
             },
             {
+                "id": 4,
                 "title": "Foo",
                 "index": 1,
                 "tags": "foo bar",
@@ -97,6 +104,7 @@ const TestHelpers = {
                 "category_id": 2
             },
             {
+                "id": 5,
                 "title": "Foo",
                 "index": 2,
                 "tags": "foo bar",

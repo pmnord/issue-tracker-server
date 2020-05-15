@@ -6,9 +6,9 @@ const { assert } = require('chai');
 
 describe('Project endpoints', () => {
     let db;
-    const testProject = TestHelpers.makeTestProject;
-    const testCategories = TestHelpers.makeTestCategories;
-    const testTasks = TestHelpers.makeTestTasks;
+    const testProject = TestHelpers.makeTestProject();
+    const testCategories = TestHelpers.makeTestCategories();
+    const testTasks = TestHelpers.makeTestTasks();
 
     before('Create the db instance', () => {
         db = knex({
@@ -22,6 +22,15 @@ describe('Project endpoints', () => {
     after('Destroy the db instance', () => db.destroy());
     afterEach('Clean the database tables again', () => TestHelpers.truncateDbTables(db));
 
+    describe(`GET /project`, () => {
+        it('Responds with 400 and a suggested fix', () => {
+            return supertest(app)
+                .get('/api/project')
+                .set('api-key', config.WEDO_API_KEY)
+                .expect(400, 'The project home route is only available for POST requests. Did you mean to request the /api/project/:project_uuid route?')
+        })
+    })
+
     describe(`POST /project`, () => {
         it('Responds with 201 and a new project uuid', () => {
             return supertest(app)
@@ -32,7 +41,7 @@ describe('Project endpoints', () => {
         });
     });
 
-    describe.skip('GET /project/:uuid', () => {
+    describe('GET /project/:uuid', () => {
         beforeEach('Seed the database', () => TestHelpers.seedDbTables(db, testProject, testCategories, testTasks));
 
         it('Responds with 200 and the project object', () => {
@@ -40,7 +49,11 @@ describe('Project endpoints', () => {
                 .get(`/api/project/${testProject[0].uuid}`)
                 .set('api-key', config.WEDO_API_KEY)
                 .expect(200)
-                .expect(response => assert.typeOf(response.body, 'object'))
+                .expect(response => {
+                    assert.typeOf(response.body, 'object');
+                    assert.typeOf(response.body.categories[0], 'object')
+                    assert.typeOf(response.body.categories[0].tasks[0], 'object')
+                })
         })
     });
 });

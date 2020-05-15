@@ -10,7 +10,7 @@ const ProjectRouter = express.Router();
 ProjectRouter
     .route('/')
     .get((req, res, next) =>
-        res.send('The project home route is only available for POST requests. Did you mean to request the /api/project/:project_uuid route?')
+        res.status(400).send('The project home route is only available for POST requests. Did you mean to request the /api/project/:project_uuid route?')
     )
     .post((req, res, next) => {
         const uuid = nanoid();
