@@ -1,9 +1,11 @@
-const app = require("../src/app.js")
+const app = require("../src/app.js");
+const config = require('../src/config');
 
 describe("App", () => {
-    it("GET / responds with 200 containing 'Hello boilerplate!'", () => {
+    it("GET / responds with 200 containing 'You've reached the WeDo API'", () => {
         return supertest(app)
             .get('/')
-            .expect(200, 'Hello boilerplate!')
+            .set('api-key', config.WEDO_API_KEY)
+            .expect(200, `You've reached the WeDo API`)
     })
 });

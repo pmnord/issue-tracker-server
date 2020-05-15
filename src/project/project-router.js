@@ -18,7 +18,7 @@ ProjectRouter
             req.app.get('db'),
             { uuid }
         )
-            .then(project_uuid => res.json(project_uuid))
+            .then(project => res.status(201).json(project.uuid))
             .catch(next)
     })
 
@@ -26,10 +26,11 @@ ProjectRouter
     .route('/:project_uuid')
     .get((req, res, next) => {
         let project;
+        let db = req.app.get('db');
 
-        // When the client requests a project, first validate that the project exists
+        // Validate that the project exists
         ProjectService.getProject(
-            req.app.get('db'),
+            db,
             req.params.project_uuid
         )
             .then(dbRes => {
@@ -37,9 +38,21 @@ ProjectRouter
                     ? project = { ...dbRes[0] }
                     : res.status(404).json({ Error: "Project not found" });
             })
+            .then(() => {
+                // Update the last_accessed date on every GET request
+                // So that we can clear old projects
+                return db.transaction(trx =>
+                    trx.raw(
+                        `UPDATE wedo_projects
+                            SET last_accessed=now()
+                            WHERE id=${project.id}
+                        `
+                    )
+                );
+            })
             .then(async () => {
                 await CategoryService.getCategoriesByProjectId(
-                    req.app.get('db'),
+                    db,
                     project.id
                 )
                     .then(dbRes => {
@@ -48,7 +61,7 @@ ProjectRouter
 
                 for (let category of project.categories) {
                     await TaskService.getTasksByCategoryId(
-                        req.app.get('db'),
+                        db,
                         category.id
                     )
                         .then(dbRes => {
