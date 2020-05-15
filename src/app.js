@@ -3,7 +3,7 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
-const { NODE_ENV } = require('./config');
+const { NODE_ENV, CLIENT_ORIGIN } = require('./config');
 
 const ProjectRouter = require('./project/project-router');
 const CategoryRouter = require('./category/category-router');
@@ -18,18 +18,20 @@ const morganOption = (NODE_ENV === 'production')
 
 app.use(morgan(morganOption)); // Logging middleware
 app.use(helmet()); // Obscures response headers
-app.use(cors()); // Enables cross-origin resource sharing
-                  // Be sure to set the CLIENT_ORIGIN environmental variable when you hook up the front end
+app.use(
+  cors({ // Enables cross-origin resource sharing
+    origin: CLIENT_ORIGIN // Be sure to set the CLIENT_ORIGIN environmental variable when you hook up the front end
+  })
+);
 
 // API Key authentication
 app.use((req, res, next) => {
   const apiKey = req.get('api-key');
 
-  if (!apiKey) {return res.status(400).json({error: 'This server requires an API key'})};
-  if (apiKey != process.env.WEDO_API_KEY) {return res.status(401).json({error: 'Invalid API key'})};
+  if (!apiKey) { return res.status(400).json({ error: 'This server requires an API key' }) };
+  if (apiKey != process.env.WEDO_API_KEY) { return res.status(401).json({ error: 'Invalid API key' }) };
   return next();
 });
-
 
 app.get('/', (req, res) => {
   res.send("You've reached the WeDo API");
