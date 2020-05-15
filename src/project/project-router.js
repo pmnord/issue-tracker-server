@@ -75,8 +75,8 @@ ProjectRouter
                                     // Because tags are being stored as text in the database,
                                     // we convert spaces into entity codes for storage
                                     // and then convert them back on retrieval.
-                                    task.tags = task.tags.split(' ').map(str => str.replace(/&#32;/g, ' '));
                                     task.tags = xss(task.tags);
+                                    task.tags = task.tags.split(' ').map(str => str.replace(/&#32;/g, ' '));
                                     task.notes = xss(task.notes);
                                     task.title = xss(task.title);
                                 }
