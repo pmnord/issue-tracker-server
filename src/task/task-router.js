@@ -61,9 +61,9 @@ TaskRouter
             category_id } = req.body;
 
         const newValues = {
-            title: xss(title),
-            tags: xss(tags),
-            notes: xss(notes),
+            title,
+            tags,
+            notes,
             index,
             category_id
         };
