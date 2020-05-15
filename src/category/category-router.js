@@ -23,7 +23,7 @@ CategoryRouter
             req.app.get('db'),
             newCategory
         )
-            .then(dbCategory => res.status(201).json(dbCategory))
+            .then(dbCategory => res.status(201).end())
             .catch(err => {
                 res.status(400).json({ error: `${err}`});
                 next;

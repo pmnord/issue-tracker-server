@@ -5,23 +5,28 @@ const TestHelpers = {
         return db.transaction(async (trx) => {
             // The tables contain reference values to each other
             // Therefore we need to do this part async
+
             await trx.into('wedo_projects').insert(projects);
             await trx.raw(
                 `SELECT setval('wedo_projects_id_seq', ?)`,
                 [projects[projects.length - 1].id]
             );
+            
+            if (categories) {
+                await trx.into('wedo_categories').insert(categories);
+                await trx.raw(
+                    `SELECT setval('wedo_categories_id_seq', ?)`,
+                    [categories[categories.length - 1].id]
+                );
+            }
 
-            await trx.into('wedo_categories').insert(categories);
-            await trx.raw(
-                `SELECT setval('wedo_categories_id_seq', ?)`,
-                [categories[categories.length - 1].id]
-            );
-
-            await trx.into('wedo_tasks').insert(tasks);
-            await trx.raw(
-                `SELECT setval('wedo_tasks_id_seq', ?)`,
-                [tasks[tasks.length - 1].id]
-            );
+            if (tasks) {
+                await trx.into('wedo_tasks').insert(tasks);
+                await trx.raw(
+                    `SELECT setval('wedo_tasks_id_seq', ?)`,
+                    [tasks[tasks.length - 1].id]
+                );
+            }
         });
     },
     truncateDbTables(db) {
