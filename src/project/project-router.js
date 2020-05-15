@@ -3,6 +3,7 @@ const { nanoid } = require('nanoid');
 const ProjectService = require('./project-service.js');
 const CategoryService = require('../category/category-service');
 const TaskService = require('../task/task-service');
+const xss = require('xss');
 
 const ProjectRouter = express.Router();
 
@@ -75,10 +76,14 @@ ProjectRouter
                                     // we convert spaces into entity codes for storage
                                     // and then convert them back on retrieval.
                                     task.tags = task.tags.split(' ').map(str => str.replace(/&#32;/g, ' '));
+                                    task.tags = xss(task.tags);
+                                    task.notes = xss(task.notes);
+                                    task.title = xss(task.title);
                                 }
                             })
                             
                             category.tasks = tasks.sort((a, b) => a.index - b.index);
+                            category.title = xss(category.title);
                             
                             return;
                         })

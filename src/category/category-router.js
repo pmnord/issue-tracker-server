@@ -1,6 +1,7 @@
 const express = require('express');
 const CategoryService = require('./category-service');
 const jsonBodyParser = express.json();
+const xss = require('xss');
 
 const CategoryRouter = express.Router();
 
@@ -13,7 +14,7 @@ CategoryRouter
         const { title, index, project_id } = req.body;
 
         const newCategory = {
-            title,
+            title: xss(title),
             index,
             project_id,
         }
@@ -36,7 +37,10 @@ CategoryRouter
 
         const { title, index } = req.body;
 
-        const newValues = { title, index };
+        const newValues = { 
+            title: xss(title), 
+            index 
+        };
 
         CategoryService.updateCategory(
             req.app.get('db'),

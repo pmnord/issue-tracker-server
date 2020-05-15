@@ -1,6 +1,7 @@
 const express = require('express');
 const TaskService = require('./Task-service');
 const jsonBodyParser = express.json();
+const xss = require('xss');
 
 const TaskRouter = express.Router();
 
@@ -22,7 +23,7 @@ TaskRouter
             category_id } = req.body;
 
         const newTask = {
-            title,
+            title: xss(title),
             index,
             category_id,
         };
@@ -60,10 +61,10 @@ TaskRouter
             category_id } = req.body;
 
         const newValues = {
-            title,
+            title: xss(title),
+            tags: xss(tags),
+            notes: xss(notes),
             index,
-            tags,
-            notes,
             category_id
         };
 
