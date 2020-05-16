@@ -31,15 +31,7 @@ Returns a project object, complete with categories and tasks subarrays. The proj
 
 ## Entity Relationships (PostgreSQL tables)
 
-|Users|Projects|Categories|Tasks|Project_Users|
-|-|-|-|-|-|
-|id|id|id|id|id|
-|username|name|name|title|project_id|
-|password|user_id|project_id|category_id|user_id|
-|project_id|||assigned_user||
-||||due_date||
-||||note||
-||||priority||
+![Entity Relationship Diagram](./resources/wedo_erd.png)
 
 ## Development Roadmap
 
