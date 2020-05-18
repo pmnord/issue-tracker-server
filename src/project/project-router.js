@@ -35,61 +35,63 @@ ProjectRouter
             req.params.project_uuid
         )
             .then(dbRes => {
-                return dbRes.length > 0
-                    ? project = { ...dbRes[0] }
-                    : res.status(404).json({ Error: "Project not found" });
-            })
-            .then(() => {
-                // Update the last_accessed date on every GET request
-                // So that we can clear old projects
-                return db.transaction(trx =>
-                    trx.raw(
-                        `UPDATE wedo_projects
-                            SET last_accessed=now()
-                            WHERE id=${project.id}
-                        `
-                    )
-                );
-            })
-            .then(async () => {
-                await CategoryService.getCategoriesByProjectId(
-                    db,
-                    project.id
-                )
-                    .then(dbRes => {
-                        return project.categories = dbRes;
-                    })
-
-                for (let category of project.categories) {
-                    await TaskService.getTasksByCategoryId(
-                        db,
-                        category.id
-                    )
-                        .then(dbRes => {
-                            const tasks = dbRes;
-                            
-                            // Set up each task's tags as an array
-                            tasks.forEach(task => {
-                                if (!task.tags) {task.tags = []}
-                                else {
-                                    // Because tags are being stored as text in the database,
-                                    // we convert spaces into entity codes for storage
-                                    // and then convert them back on retrieval.
-                                    task.tags = xss(task.tags);
-                                    task.tags = task.tags.split(' ').map(str => str.replace(/&#32;/g, ' '));
-                                    task.notes = xss(task.notes);
-                                    task.title = xss(task.title);
-                                }
-                            })
-                            
-                            category.tasks = tasks.sort((a, b) => a.index - b.index);
-                            category.title = xss(category.title);
-                            
-                            return;
-                        })
+                // Handle requests for non-existing databases
+                if (dbRes.length < 1) {
+                    return res.status(404).json({ Error: "Project not found" })
                 }
 
-                return res.status(200).json(project);
+                else {
+                    project = { ...dbRes[0] };
+
+                    // Update the last_accessed date on every GET request
+                    // So that we can clear old projects
+                    return db.transaction(trx =>
+                        trx.raw(
+                            `UPDATE wedo_projects
+                            SET last_accessed=now()
+                            WHERE id=${project.id}
+                            `
+                        ).then(async () => {
+                            await CategoryService.getCategoriesByProjectId(
+                                db,
+                                project.id
+                            )
+                                .then(dbRes => {
+                                    return project.categories = dbRes;
+                                })
+
+                            for (let category of project.categories) {
+                                await TaskService.getTasksByCategoryId(
+                                    db,
+                                    category.id
+                                )
+                                    .then(dbRes => {
+                                        const tasks = dbRes;
+
+                                        // Set up each task's tags as an array
+                                        tasks.forEach(task => {
+                                            if (!task.tags) { task.tags = [] }
+                                            else {
+                                                // Because tags are being stored as text in the database,
+                                                // we convert spaces into entity codes for storage
+                                                // and then convert them back on retrieval.
+                                                task.tags = xss(task.tags);
+                                                task.tags = task.tags.split(' ').map(str => str.replace(/&#32;/g, ' '));
+                                                task.notes = xss(task.notes);
+                                                task.title = xss(task.title);
+                                            }
+                                        })
+
+                                        category.tasks = tasks.sort((a, b) => a.index - b.index);
+                                        category.title = xss(category.title);
+
+                                        return;
+                                    })
+                            }
+                            return res.status(200).json(project);
+                        })
+                    );
+                }
             })
             .catch(next)
     })
