@@ -77,9 +77,10 @@ ProjectRouter
                                                 // and then convert them back on retrieval.
                                                 task.tags = xss(task.tags);
                                                 task.tags = task.tags.split(' ').map(str => str.replace(/&#32;/g, ' '));
-                                                task.notes = xss(task.notes);
-                                                task.title = xss(task.title);
                                             }
+
+                                            task.notes = task.notes ? xss(task.notes) : '';
+                                            task.title = xss(task.title);
                                         })
 
                                         category.tasks = tasks.sort((a, b) => a.index - b.index);
