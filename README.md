@@ -2,7 +2,7 @@
 
 A collaborative kanban board supporting user concurrency, implemented with React on the front end and Node.js on the back end.
 
-[Demo](https://we-do.now.sh/)
+[Demo](https://wedo.now.sh/)
 
 [Frontend Documentation](https://github.com/pmnord/todo-management-react-capstone-client)
 
