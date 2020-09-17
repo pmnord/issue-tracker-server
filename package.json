@@ -36,5 +36,9 @@
     "nodemon": "^2.0.2",
     "postgrator-cli": "^3.3.0",
     "supertest": "^4.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/pmnord/todo-management-react-capstone-server.git"
   }
 }
