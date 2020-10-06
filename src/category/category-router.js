@@ -27,8 +27,10 @@ CategoryRouter.route('/').post(jsonBodyParser, (req, res, next) => {
   CategoryService.insertCategory(req.app.get('db'), newCategory)
     .then((dbCategory) => res.status(201).json(dbCategory))
     .catch((err) => {
-      res.status(400).json({ error: `${err}` });
-      next;
+      res
+        .status(400)
+        .json({ error: `${err}` })
+        .catch(next);
     });
 });
 
@@ -38,20 +40,36 @@ CategoryRouter.route('/:category_id')
       return res.status(400).json({ Error: `Missing request body` });
     }
 
-    const { title, index } = req.body;
+    /* This endpoint is handling two cases, category names being updated and
+    categories being reordered. Only one of those actions can happen at a time
+    on the client side, so we separate the logic into two conditionals */
 
-    const newValues = {
-      title: xss(title),
-      index,
-    };
+    if (req.body.title) {
+      const newValues = {
+        title: xss(req.body.title),
+      };
 
-    CategoryService.updateCategory(
-      req.app.get('db'),
-      req.params.category_id,
-      newValues
-    )
-      .then(() => res.status(204).end())
-      .catch(next);
+      CategoryService.updateCategory(
+        req.app.get('db'),
+        req.params.category_id,
+        newValues
+      )
+        .then(() => res.status(204).end())
+        .catch(next);
+    } else if (req.body.toReIndex) {
+      console.log(req.body.toReIndex);
+      req.body.toReIndex.forEach((category, idx) => {
+        CategoryService.updateCategory(req.app.get('db'), category.id, {
+          index: idx,
+        });
+      });
+      res.status(204).end();
+    } else {
+      res.status(400).json({
+        error:
+          'Include either a new title or a collection of categories toReIndex',
+      });
+    }
   })
   .delete(jsonBodyParser, (req, res, next) => {
     const db = req.app.get('db');

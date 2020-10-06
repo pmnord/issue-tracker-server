@@ -3,6 +3,7 @@ CREATE TABLE wedo_categories (
     uuid TEXT NOT NULL UNIQUE,
     date_created TIMESTAMP DEFAULT now() NOT NULL,
     title TEXT NOT NULL,
+    color TEXT,
     index INTEGER,
     project_id INTEGER
         REFERENCES wedo_projects(id) ON DELETE CASCADE NOT NULL

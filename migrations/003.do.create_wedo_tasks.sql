@@ -3,6 +3,7 @@ CREATE TABLE wedo_tasks (
     uuid TEXT NOT NULL UNIQUE, --in case of collision the new task will simply not be created
     date_created TIMESTAMP DEFAULT now() NOT NULL,
     title TEXT NOT NULL,
+    color TEXT,
     index INTEGER,
     tags TEXT,
     notes TEXT,

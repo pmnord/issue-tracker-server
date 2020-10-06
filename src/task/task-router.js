@@ -45,14 +45,13 @@ TaskRouter.route('/:task_id')
     if (req.body.toReIndex) {
       for (let category of req.body.toReIndex) {
         category.tasks.forEach(({ id }, idx) => {
-          console.log(id);
           TaskService.updateTask(req.app.get('db'), id, {
             index: idx,
           });
         });
       }
+      res.status(204).end();
     }
-
     const { title, tags, notes, category_uuid } = req.body;
 
     const newValues = {
