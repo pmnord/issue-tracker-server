@@ -70,7 +70,7 @@ TaskRouter.route('/:task_id')
     const db = req.app.get('db');
 
     toReIndex.forEach((task) => {
-      TaskService.updateTask(db, task.id, { index: task.index - 1 });
+      TaskService.updateTask(db, task.uuid, { index: task.index - 1 });
     });
 
     TaskService.deleteTask(db, req.params.task_id)

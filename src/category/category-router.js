@@ -34,7 +34,7 @@ CategoryRouter.route('/').post(jsonBodyParser, (req, res, next) => {
     });
 });
 
-CategoryRouter.route('/:category_id')
+CategoryRouter.route('/:category_uuid')
   .patch(jsonBodyParser, (req, res, next) => {
     if (!req.body) {
       return res.status(400).json({ Error: `Missing request body` });
@@ -51,16 +51,16 @@ CategoryRouter.route('/:category_id')
 
       CategoryService.updateCategory(
         req.app.get('db'),
-        req.params.category_id,
+        req.params.category_uuid,
         newValues
       )
         .then(() => res.status(204).end())
         .catch(next);
     } else if (req.body.toReIndex) {
       console.log(req.body.toReIndex);
-      req.body.toReIndex.forEach((category, idx) => {
-        CategoryService.updateCategory(req.app.get('db'), category.id, {
-          index: idx,
+      req.body.toReIndex.forEach((category) => {
+        CategoryService.updateCategory(req.app.get('db'), category.uuid, {
+          index: category.index,
         });
       });
       res.status(204).end();
@@ -73,9 +73,8 @@ CategoryRouter.route('/:category_id')
   })
   .delete(jsonBodyParser, (req, res, next) => {
     const db = req.app.get('db');
-    console.log(req.body);
 
-    CategoryService.deleteCategory(db, req.params.category_id)
+    CategoryService.deleteCategory(db, req.params.category_uuid)
       .then(async () => {
         const { toReIndex } = req.body;
 
@@ -83,12 +82,15 @@ CategoryRouter.route('/:category_id')
                 of the other categories accordingly */
 
         await toReIndex.forEach((category) => {
-          CategoryService.updateCategory(db, category.id, {
+          CategoryService.updateCategory(db, category.uuid, {
             index: category.index - 1,
           });
         });
 
-        await CategoryService.deleteTasksInCategory(db, req.params.category_id);
+        await CategoryService.deleteTasksInCategory(
+          db,
+          req.params.category_uuid
+        );
 
         return res.status(204).end();
       })
