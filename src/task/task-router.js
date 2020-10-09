@@ -39,24 +39,26 @@ TaskRouter.route('/:task_id')
       return res.status(400).json({ Error: `Missing request body` });
     }
 
-    /* In case a task is swapping indexes with another task, the client must
-        send a 'swapee' object containing the id of the object and its new index */
-    if (req.body.swapee) {
-      const { swapee } = req.body;
-
-      TaskService.updateTask(req.app.get('db'), swapee.id, {
-        index: swapee.index,
-      });
+    /* If a task is moving within the Kanban board, you must include
+    an array with the category object the task was moved from 
+    and the category object that it was moved to. */
+    if (req.body.toReIndex) {
+      for (let category of req.body.toReIndex) {
+        category.tasks.forEach(({ id }, idx) => {
+          TaskService.updateTask(req.app.get('db'), id, {
+            index: idx,
+          });
+        });
+      }
+      res.status(204).end();
     }
-
-    const { title, index, tags, notes, category_id } = req.body;
+    const { title, tags, notes, category_uuid } = req.body;
 
     const newValues = {
       title,
       tags,
       notes,
-      index,
-      category_id,
+      category_uuid,
     };
 
     TaskService.updateTask(req.app.get('db'), req.params.task_id, newValues)
@@ -68,7 +70,7 @@ TaskRouter.route('/:task_id')
     const db = req.app.get('db');
 
     toReIndex.forEach((task) => {
-      TaskService.updateTask(db, task.id, { index: task.index - 1 });
+      TaskService.updateTask(db, task.uuid, { index: task.index - 1 });
     });
 
     TaskService.deleteTask(db, req.params.task_id)

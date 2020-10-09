@@ -63,7 +63,7 @@ ProjectRouter.route('/:project_uuid').get((req, res, next) => {
 
                     // Set up each task's tags as an array
                     tasks.forEach((task) => {
-                      if (!task.tags) {
+                      if (!task.tags || task.tags.length === 0) {
                         task.tags = [];
                       } else {
                         // Because tags are being stored as text in the database,
