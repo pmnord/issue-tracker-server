@@ -33,7 +33,7 @@ TaskRouter.route('/').post(jsonBodyParser, (req, res, next) => {
     .catch(next);
 });
 
-TaskRouter.route('/:task_id')
+TaskRouter.route('/:task_uuid')
   .patch(jsonBodyParser, (req, res, next) => {
     if (!req.body) {
       return res.status(400).json({ Error: `Missing request body` });
@@ -43,9 +43,10 @@ TaskRouter.route('/:task_id')
     an array with the category object the task was moved from 
     and the category object that it was moved to. */
     if (req.body.toReIndex) {
+      console.log('reindex fired');
       for (let category of req.body.toReIndex) {
-        category.tasks.forEach(({ id }, idx) => {
-          TaskService.updateTask(req.app.get('db'), id, {
+        category.tasks.forEach(({ uuid }, idx) => {
+          TaskService.updateTask(req.app.get('db'), uuid, {
             index: idx,
           });
         });
@@ -61,7 +62,7 @@ TaskRouter.route('/:task_id')
       category_uuid,
     };
 
-    TaskService.updateTask(req.app.get('db'), req.params.task_id, newValues)
+    TaskService.updateTask(req.app.get('db'), req.params.task_uuid, newValues)
       .then(() => res.status(204).end())
       .catch(next);
   })
