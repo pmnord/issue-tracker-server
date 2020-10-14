@@ -10,17 +10,18 @@ const CategoryRouter = require('./category/category-router');
 const TaskRouter = require('./task/task-router');
 
 const app = express();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
 
 // Logging
-const morganOption = (NODE_ENV === 'production')
-  ? 'tiny'
-  : 'common';
+const morganOption = NODE_ENV === 'production' ? 'tiny' : 'common';
 
 app.use(morgan(morganOption)); // Logging middleware
 app.use(helmet()); // Obscures response headers
 app.use(
-  cors({ // Enables cross-origin resource sharing
-    origin: CLIENT_ORIGIN // Be sure to set the CLIENT_ORIGIN environmental variable when you hook up the front end
+  cors({
+    // Enables cross-origin resource sharing
+    origin: CLIENT_ORIGIN, // Be sure to set the CLIENT_ORIGIN environmental variable when you hook up the front end
   })
 );
 
@@ -28,8 +29,12 @@ app.use(
 app.use((req, res, next) => {
   const apiKey = req.get('api-key');
 
-  if (!apiKey) { return res.status(400).json({ error: 'This server requires an API key' }) };
-  if (apiKey != process.env.WEDO_API_KEY) { return res.status(401).json({ error: 'Invalid API key' }) };
+  if (!apiKey) {
+    return res.status(400).json({ error: 'This server requires an API key' });
+  }
+  if (apiKey != process.env.WEDO_API_KEY) {
+    return res.status(401).json({ error: 'Invalid API key' });
+  }
   return next();
 });
 
@@ -40,19 +45,48 @@ app.use('/api/project', ProjectRouter);
 app.use('/api/category', CategoryRouter);
 app.use('/api/task', TaskRouter);
 
+// io.on('connection', (socket) => {
+//   socket.broadcast.emit('connection');
+
+//   socket.on('update', (categories) => {
+//     console.log(categories);
+//     io.emit('update', categories);
+//   });
+
+//   socket.on('disconnect', () => {
+//     io.emit('disconnect');
+//   });
+// });
+
+const workspaces = io.of(/^\/api\/\w+-\w+-\d+$/g);
+workspaces.on('connection', (socket) => {
+  const workspace = socket.nsp;
+
+  socket.broadcast.emit('connection');
+  console.log('User connected');
+
+  socket.on('update', (categories) => {
+    workspace.emit('update', categories);
+  });
+
+  socket.on('disconnect', () => {
+    workspace.emit('disconnect');
+  });
+});
+
 // Error handler
 app.use(function errorHandler(error, req, res, next) {
   let response;
   if (NODE_ENV === 'production') {
-    response = { error: { message: 'server error' } }
+    response = { error: { message: 'server error' } };
   } else {
-    console.error(error)
-    response = { message: error.message, error }
+    console.error(error);
+    response = { message: error.message, error };
   }
-  res.status(500).json(response)
+  res.status(500).json(response);
 });
 
-module.exports = app;
+module.exports = { app, http };
 
 /* ------------------------------ Heroku Limits ----------------------------- */
 

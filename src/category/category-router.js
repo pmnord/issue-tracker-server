@@ -57,10 +57,9 @@ CategoryRouter.route('/:category_uuid')
         .then(() => res.status(204).end())
         .catch(next);
     } else if (req.body.toReIndex) {
-      console.log(req.body.toReIndex);
-      req.body.toReIndex.forEach((category) => {
-        CategoryService.updateCategory(req.app.get('db'), category.uuid, {
-          index: category.index,
+      req.body.toReIndex.forEach((category_uuid, idx) => {
+        CategoryService.updateCategory(req.app.get('db'), category_uuid, {
+          index: idx,
         });
       });
       res.status(204).end();
