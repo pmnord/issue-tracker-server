@@ -58,7 +58,7 @@ app.use('/api/task', TaskRouter);
 //   });
 // });
 
-const workspaces = io.of(/^\/\w+-\w+-\d+$/g);
+const workspaces = io.of(/^\/api\/\w+-\w+-\d+$/g);
 workspaces.on('connection', (socket) => {
   const workspace = socket.nsp;
 
@@ -66,7 +66,6 @@ workspaces.on('connection', (socket) => {
   console.log('User connected');
 
   socket.on('update', (categories) => {
-    console.log(categories);
     workspace.emit('update', categories);
   });
 

@@ -17,8 +17,8 @@ const TaskService = {
       .returning('*')
       .then((rows) => rows[0]);
   },
-  deleteTask(db, id) {
-    return db.from('wedo_tasks').where({ id }).delete();
+  deleteTask(db, uuid) {
+    return db.from('wedo_tasks').where({ uuid }).delete();
   },
 };
 

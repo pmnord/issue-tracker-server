@@ -69,12 +69,13 @@ TaskRouter.route('/:task_uuid')
   .delete(jsonBodyParser, (req, res, next) => {
     const { toReIndex } = req.body;
     const db = req.app.get('db');
+    const task_uuid = req.params.task_uuid;
 
-    toReIndex.forEach((task) => {
-      TaskService.updateTask(db, task.uuid, { index: task.index - 1 });
+    toReIndex.forEach((task, idx) => {
+      TaskService.updateTask(db, task.uuid, { index: idx });
     });
 
-    TaskService.deleteTask(db, req.params.task_id)
+    TaskService.deleteTask(db, task_uuid)
       .then(() => res.status(204).end())
       .catch(next);
   });
