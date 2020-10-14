@@ -45,12 +45,33 @@ app.use('/api/project', ProjectRouter);
 app.use('/api/category', CategoryRouter);
 app.use('/api/task', TaskRouter);
 
-io.on('connection', (socket) => {
-  console.log('A user connected');
+// io.on('connection', (socket) => {
+//   socket.broadcast.emit('connection');
+
+//   socket.on('update', (categories) => {
+//     console.log(categories);
+//     io.emit('update', categories);
+//   });
+
+//   socket.on('disconnect', () => {
+//     io.emit('disconnect');
+//   });
+// });
+
+const workspaces = io.of(/^\/\w+-\w+-\d+$/g);
+workspaces.on('connection', (socket) => {
+  const workspace = socket.nsp;
+
+  socket.broadcast.emit('connection');
+  console.log('User connected');
 
   socket.on('update', (categories) => {
     console.log(categories);
-    io.emit('update', categories);
+    workspace.emit('update', categories);
+  });
+
+  socket.on('disconnect', () => {
+    workspace.emit('disconnect');
   });
 });
 
