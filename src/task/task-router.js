@@ -42,6 +42,7 @@ TaskRouter.route('/:task_uuid')
     /* If a task is moving within the Kanban board, you must include
     an array with the category object the task was moved from 
     and the category object that it was moved to. */
+
     if (req.body.toReIndex) {
       console.log('reindex fired');
       for (let category of req.body.toReIndex) {

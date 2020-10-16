@@ -57,34 +57,36 @@ ProjectRouter.route('/:project_uuid').get((req, res, next) => {
               });
 
               for (let category of project.categories) {
-                await TaskService.getTasksByCategoryId(db, category.uuid).then(
-                  (dbRes) => {
-                    const tasks = dbRes;
+                await TaskService.getTasksByCategoryUuid(
+                  db,
+                  category.uuid
+                ).then((tasks) => {
+                  // Tasks and notes are serialized for storage in the database
+                  // We're parsing them here into an array that will be returned to the client
+                  tasks.forEach((task) => {
+                    if (!task.tags || task.tags.length === 0) {
+                      task.tags = [];
+                    } else {
+                      task.tags = xss(task.tags)
+                        .split(' ')
+                        .map((tag) => tag.replace(/&#32;/g, ' '));
+                    }
+                    if (!task.notes || task.notes.length === 0) {
+                      task.notes = [];
+                    } else {
+                      task.notes = xss(task.notes)
+                        .split(' ')
+                        .map((note) => note.replace(/&#32;/g, ' '));
+                    }
 
-                    // Set up each task's tags as an array
-                    tasks.forEach((task) => {
-                      if (!task.tags || task.tags.length === 0) {
-                        task.tags = [];
-                      } else {
-                        // Because tags are being stored as text in the database,
-                        // we convert spaces into entity codes for storage
-                        // and then convert them back on retrieval.
-                        task.tags = xss(task.tags);
-                        task.tags = task.tags
-                          .split(' ')
-                          .map((str) => str.replace(/&#32;/g, ' '));
-                      }
+                    task.title = xss(task.title);
+                  });
 
-                      task.notes = task.notes ? xss(task.notes) : '';
-                      task.title = xss(task.title);
-                    });
+                  category.tasks = tasks.sort((a, b) => a.index - b.index);
+                  category.title = xss(category.title);
 
-                    category.tasks = tasks.sort((a, b) => a.index - b.index);
-                    category.title = xss(category.title);
-
-                    return;
-                  }
-                );
+                  return;
+                });
               }
               return res.status(200).json(project);
             })

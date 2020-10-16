@@ -1,5 +1,5 @@
 const TaskService = {
-  getTasksByCategoryId(db, category_uuid) {
+  getTasksByCategoryUuid(db, category_uuid) {
     return db.from('wedo_tasks').select('*').where({ category_uuid });
   },
   insertTask(db, task) {
@@ -10,10 +10,9 @@ const TaskService = {
       .then((rows) => rows[0]);
   },
   updateTask(db, uuid, newValues) {
-    return db
-      .from('wedo_tasks')
-      .where({ uuid })
+    return db('wedo_tasks')
       .update(newValues)
+      .where({ uuid })
       .returning('*')
       .then((rows) => rows[0]);
   },
