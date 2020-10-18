@@ -57,15 +57,17 @@ TaskRouter.route('/:task_uuid')
     const { title, tags, notes, category_uuid } = req.body;
 
     const newValues = {
+      category_uuid,
       title,
       tags,
       notes,
-      category_uuid,
     };
 
-    TaskService.updateTask(req.app.get('db'), req.params.task_uuid, newValues)
-      .then(() => res.status(204).end())
-      .catch(next);
+    TaskService.updateTask(
+      req.app.get('db'),
+      req.params.task_uuid,
+      newValues
+    ).catch(next);
   })
   .delete(jsonBodyParser, (req, res, next) => {
     const { toReIndex } = req.body;
