@@ -52,8 +52,9 @@ ProjectRouter.route('/:project_uuid').get((req, res, next) => {
               await CategoryService.getCategoriesByProjectId(
                 db,
                 project.id
-              ).then((dbRes) => {
-                return (project.categories = dbRes);
+              ).then((dbCategories) => {
+                project.categories = dbCategories;
+                project.categories.sort((a, b) => a.index - b.index);
               });
 
               for (let category of project.categories) {
