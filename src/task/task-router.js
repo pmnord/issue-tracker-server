@@ -44,7 +44,6 @@ TaskRouter.route('/:task_uuid')
     and the category object that it was moved to. */
 
     if (req.body.toReIndex) {
-      console.log('reindex fired');
       for (let category of req.body.toReIndex) {
         category.tasks.forEach(({ uuid }, idx) => {
           TaskService.updateTask(req.app.get('db'), uuid, {

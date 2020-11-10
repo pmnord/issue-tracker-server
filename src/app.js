@@ -63,14 +63,15 @@ workspaces.on('connection', (socket) => {
   const workspace = socket.nsp;
 
   socket.broadcast.emit('connection');
-  console.log('User connected');
-
+  console.log(`User connected to project ${workspace.name.replace('/api/', '')}`);
+  
   socket.on('update', (categories) => {
     workspace.emit('update', categories);
   });
-
+  
   socket.on('disconnect', () => {
     workspace.emit('disconnect');
+    console.log(`User disconnected from project ${workspace.name.replace('/api/', '')}`);
   });
 });
 
