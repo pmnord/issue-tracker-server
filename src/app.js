@@ -39,7 +39,7 @@ app.use((req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-  res.send("You've reached the WeDo API");
+  res.send("You've reached the Collab API");
 });
 app.use('/api/project', ProjectRouter);
 app.use('/api/category', CategoryRouter);

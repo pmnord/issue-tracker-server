@@ -1,17 +1,17 @@
-const express = require('express');
-const TaskService = require('./task-service');
+const express = require("express");
+const TaskService = require("./task-service");
 const jsonBodyParser = express.json();
-const xss = require('xss');
+const xss = require("xss");
 
 const TaskRouter = express.Router();
 
-TaskRouter.route('/').post(jsonBodyParser, (req, res, next) => {
+TaskRouter.route("/").post(jsonBodyParser, (req, res, next) => {
   if (!req.body) {
     return res.status(400).json({ Error: `Missing request body` });
   }
 
   // Validate that necessary values are being sent by the client
-  for (let prop of ['title', 'index', 'category_uuid']) {
+  for (let prop of ["title", "index", "category_uuid"]) {
     if (req.body[prop] === undefined) {
       return res
         .status(400)
@@ -28,49 +28,49 @@ TaskRouter.route('/').post(jsonBodyParser, (req, res, next) => {
     category_uuid,
   };
 
-  TaskService.insertTask(req.app.get('db'), newTask)
+  TaskService.insertTask(req.app.get("db"), newTask)
     .then((dbTask) => res.status(201).json(dbTask))
     .catch(next);
 });
 
-TaskRouter.route('/:task_uuid')
+TaskRouter.route("/:task_uuid")
   .patch(jsonBodyParser, (req, res, next) => {
     if (!req.body) {
       return res.status(400).json({ Error: `Missing request body` });
     }
 
-    /* If a task is moving within the Kanban board, you must include
+    /* If a task is moving within the Kanban board, you must send
     an array with the category object the task was moved from 
-    and the category object that it was moved to. */
+    and the category object that it was moved to so that indexes can be
+    updated accordingly. */
 
     if (req.body.toReIndex) {
       for (let category of req.body.toReIndex) {
         category.tasks.forEach(({ uuid }, idx) => {
-          TaskService.updateTask(req.app.get('db'), uuid, {
+          TaskService.updateTask(req.app.get("db"), uuid, {
             index: idx,
           });
         });
       }
       res.status(204).end();
+    } else {
+      const { title, tags, notes, category_uuid } = req.body;
+
+      const newValues = {
+        category_uuid,
+        title,
+        tags,
+        notes,
+      };
+
+      TaskService.updateTask(req.app.get("db"), req.params.task_uuid, newValues)
+        .then(() => res.status(204).end())
+        .catch(next);
     }
-    const { title, tags, notes, category_uuid } = req.body;
-
-    const newValues = {
-      category_uuid,
-      title,
-      tags,
-      notes,
-    };
-
-    TaskService.updateTask(
-      req.app.get('db'),
-      req.params.task_uuid,
-      newValues
-    ).catch(next);
   })
   .delete(jsonBodyParser, (req, res, next) => {
     const { toReIndex } = req.body;
-    const db = req.app.get('db');
+    const db = req.app.get("db");
     const task_uuid = req.params.task_uuid;
 
     toReIndex.forEach((task, idx) => {
