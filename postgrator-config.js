@@ -7,8 +7,8 @@ module.exports = {
     process.env.NODE_ENV === 'test'
       ? process.env.TEST_DATABASE_URL
       : process.env.DATABASE_URL,
-  //   ssl: !!process.env.SSL, // !! returns the boolean value of its argument
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  //     ssl: !!process.env.SSL, // !! returns the boolean value of its argument
+  //   ssl: {
+  //     rejectUnauthorized: false,
+  //   },
 };
