@@ -1,14 +1,12 @@
-const { app, http } = require('./app');
-const { PORT, DATABASE_URL } = require('./config');
-const knex = require('knex');
-
-const db = knex({
-  client: 'pg',
-  connection: DATABASE_URL,
+"use strict";
+var _a = require('./app'), app = _a.app, http = _a.http;
+var _b = require('./config'), PORT = _b.PORT, DATABASE_URL = _b.DATABASE_URL;
+var knex = require('knex');
+var db = knex({
+    client: 'pg',
+    connection: DATABASE_URL,
 });
-
 app.set('db', db);
-
-http.listen(PORT, () => {
-  console.log(`Server listening at http://localhost:${PORT}`);
+http.listen(PORT, function () {
+    console.log("Server listening at http://localhost:" + PORT);
 });
