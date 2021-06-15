@@ -1,23 +1,29 @@
 require('dotenv').config();
 
 // const express = require('express');
-import express, { NextFunction, Request, response, Response } from 'express';
-import morgan from 'morgan';
-import cors from 'cors';
-import helmet from 'helmet';
+import { NextFunction, Request, Response } from 'express';
+import * as express from 'express';
+import * as morgan from 'morgan';
+import * as cors from 'cors';
+import * as helmet from 'helmet';
 
-import config from './config';
+import * as config from './config.js';
 
-import ProjectRouter from './project/project-router';
-import CategoryRouter from './category/category-router';
-import TaskRouter from './task/task-router';
-import { Socket } from 'dgram';
+import ProjectRouter from './project/project-router.js';
+import CategoryRouter from './category/category-router.js';
+import TaskRouter from './task/task-router.js';
 
 const { NODE_ENV, CLIENT_ORIGIN } = config;
 
 const app = express();
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+const httpServer = require('http').createServer(app);
+const io = require('socket.io')(httpServer, {
+  // Since Socket.IO v3, you need to explicitly enable Cross-Origin Resource Sharing (CORS)
+  cors: {
+    origin: CLIENT_ORIGIN,
+    methods: ['GET', 'POST'],
+  },
+});
 
 // Logging
 const morganOption = NODE_ENV === 'production' ? 'tiny' : 'common';
@@ -50,19 +56,6 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/api/project', ProjectRouter);
 app.use('/api/category', CategoryRouter);
 app.use('/api/task', TaskRouter);
-
-// io.on('connection', (socket) => {
-//   socket.broadcast.emit('connection');
-
-//   socket.on('update', (categories) => {
-//     console.log(categories);
-//     io.emit('update', categories);
-//   });
-
-//   socket.on('disconnect', () => {
-//     io.emit('disconnect');
-//   });
-// });
 
 const workspaces = io.of(/^\/api\/\w+-\w+-\d+$/g);
 workspaces.on('connection', (socket) => {
@@ -111,7 +104,7 @@ app.use(function errorHandler(
   res.status(500).json(response);
 });
 
-module.exports = { app, http };
+module.exports = { app, http: httpServer };
 
 /* ------------------------------ Heroku Limits ----------------------------- */
 

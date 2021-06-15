@@ -1,4 +1,3 @@
-"use strict";
 module.exports = {
     PORT: process.env.PORT || 8000,
     NODE_ENV: process.env.NODE_ENV || 'development',
@@ -7,5 +6,5 @@ module.exports = {
     WEDO_API_KEY: process.env.WEDO_API_KEY,
     CLIENT_ORIGIN: process.env.NODE_ENV === 'development'
         ? "http://localhost:3000"
-        : process.env.CLIENT_ORIGIN,
+        : process.env.CLIENT_ORIGIN
 };

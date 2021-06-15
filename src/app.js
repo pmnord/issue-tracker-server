@@ -1,29 +1,31 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 require('dotenv').config();
-// const express = require('express');
-var express_1 = __importDefault(require("express"));
-var morgan_1 = __importDefault(require("morgan"));
-var cors_1 = __importDefault(require("cors"));
-var helmet_1 = __importDefault(require("helmet"));
-var config_1 = __importDefault(require("./config"));
-var project_router_1 = __importDefault(require("./project/project-router"));
-var category_router_1 = __importDefault(require("./category/category-router"));
-var task_router_1 = __importDefault(require("./task/task-router"));
-var NODE_ENV = config_1.default.NODE_ENV, CLIENT_ORIGIN = config_1.default.CLIENT_ORIGIN;
-var app = express_1.default();
-var http = require('http').createServer(app);
-var io = require('socket.io')(http);
+var express = require("express");
+var morgan = require("morgan");
+var cors = require("cors");
+var helmet = require("helmet");
+var config = require("./config.js");
+var project_router_js_1 = require("./project/project-router.js");
+var category_router_js_1 = require("./category/category-router.js");
+var task_router_js_1 = require("./task/task-router.js");
+var NODE_ENV = config.NODE_ENV, CLIENT_ORIGIN = config.CLIENT_ORIGIN;
+var app = express();
+var httpServer = require('http').createServer(app);
+var io = require('socket.io')(httpServer, {
+    // Since Socket.IO v3, you need to explicitly enable Cross-Origin Resource Sharing (CORS)
+    cors: {
+        origin: CLIENT_ORIGIN,
+        methods: ['GET', 'POST']
+    }
+});
 // Logging
 var morganOption = NODE_ENV === 'production' ? 'tiny' : 'common';
-app.use(morgan_1.default(morganOption)); // Logging middleware
-app.use(helmet_1.default()); // Obscures response headers
-app.use(cors_1.default({
+app.use(morgan(morganOption)); // Logging middleware
+app.use(helmet()); // Obscures response headers
+app.use(cors({
     // Enables cross-origin resource sharing
-    origin: CLIENT_ORIGIN, // Be sure to set the CLIENT_ORIGIN environmental variable when you hook up the front end
+    origin: CLIENT_ORIGIN
 }));
 // API Key authentication
 app.use(function (req, res, next) {
@@ -39,19 +41,9 @@ app.use(function (req, res, next) {
 app.get('/', function (req, res) {
     res.send("You've reached the Collab API");
 });
-app.use('/api/project', project_router_1.default);
-app.use('/api/category', category_router_1.default);
-app.use('/api/task', task_router_1.default);
-// io.on('connection', (socket) => {
-//   socket.broadcast.emit('connection');
-//   socket.on('update', (categories) => {
-//     console.log(categories);
-//     io.emit('update', categories);
-//   });
-//   socket.on('disconnect', () => {
-//     io.emit('disconnect');
-//   });
-// });
+app.use('/api/project', project_router_js_1["default"]);
+app.use('/api/category', category_router_js_1["default"]);
+app.use('/api/task', task_router_js_1["default"]);
 var workspaces = io.of(/^\/api\/\w+-\w+-\d+$/g);
 workspaces.on('connection', function (socket) {
     var workspace = socket.nsp;
@@ -81,7 +73,7 @@ req, res
     }
     res.status(500).json(response);
 });
-module.exports = { app: app, http: http };
+module.exports = { app: app, http: httpServer };
 /* ------------------------------ Heroku Limits ----------------------------- */
 // Each account has a pool of request tokens that can hold at most 4500 tokens. Each API call removes one token from the pool. Tokens are added to the account pool at a rate of roughly 75 per minute (or 4500 per hour), up to a maximum of 4500.
 // Read More: https://devcenter.heroku.com/articles/platform-api-reference#rate-limits
