@@ -9,9 +9,9 @@ import * as helmet from 'helmet';
 
 import * as config from './config.js';
 
-import ProjectRouter from './project/project-router.js';
-import CategoryRouter from './category/category-router.js';
-import TaskRouter from './task/task-router.js';
+import * as ProjectRouter from './project/project-router.js';
+import * as CategoryRouter from './category/category-router.js';
+import * as TaskRouter from './task/task-router.js';
 
 const { NODE_ENV, CLIENT_ORIGIN } = config;
 

@@ -6,9 +6,9 @@ var morgan = require("morgan");
 var cors = require("cors");
 var helmet = require("helmet");
 var config = require("./config.js");
-var project_router_js_1 = require("./project/project-router.js");
-var category_router_js_1 = require("./category/category-router.js");
-var task_router_js_1 = require("./task/task-router.js");
+var ProjectRouter = require("./project/project-router.js");
+var CategoryRouter = require("./category/category-router.js");
+var TaskRouter = require("./task/task-router.js");
 var NODE_ENV = config.NODE_ENV, CLIENT_ORIGIN = config.CLIENT_ORIGIN;
 var app = express();
 var httpServer = require('http').createServer(app);
@@ -41,9 +41,9 @@ app.use(function (req, res, next) {
 app.get('/', function (req, res) {
     res.send("You've reached the Collab API");
 });
-app.use('/api/project', project_router_js_1["default"]);
-app.use('/api/category', category_router_js_1["default"]);
-app.use('/api/task', task_router_js_1["default"]);
+app.use('/api/project', ProjectRouter);
+app.use('/api/category', CategoryRouter);
+app.use('/api/task', TaskRouter);
 var workspaces = io.of(/^\/api\/\w+-\w+-\d+$/g);
 workspaces.on('connection', function (socket) {
     var workspace = socket.nsp;
